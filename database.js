@@ -1,10 +1,22 @@
 const { Sequelize } = require('sequelize');
 
-// Replace 'YOUR_PASSWORD_HERE' with your real Postgres password
-const sequelize = new Sequelize('bitespeed_db', 'postgres', 'varun', {
-  host: 'localhost',
-  dialect: 'postgres',
-  logging: false, // This keeps the terminal clean
-});
+// If the app is on the internet, it will use 'process.env.DATABASE_URL'
+// If it's on your computer, it will use the local setup
+const sequelize = process.env.DATABASE_URL
+  ? new Sequelize(process.env.DATABASE_URL, {
+      dialect: 'postgres',
+      dialectOptions: {
+        ssl: {
+          require: true,
+          rejectUnauthorized: false
+        }
+      },
+      logging: false
+    })
+  : new Sequelize('bitespeed_db', 'postgres', 'YOUR_LOCAL_PASSWORD', {
+      host: 'localhost',
+      dialect: 'postgres',
+      logging: false
+    });
 
 module.exports = sequelize;
